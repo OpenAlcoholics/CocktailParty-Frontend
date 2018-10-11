@@ -134,7 +134,8 @@ viewCard cardHeader bodyItem footerItem = div [
             ("uk-card-body", True),
             ("uk-card-hover", True),
             ("uk-card-match", True)
-        ]
+        ],
+        Attr.style "background" "#fcfcfc"
     ] [
         cardHeader,
         bodyItem,
