@@ -83,7 +83,7 @@ viewImage image = img [
     ] []
 
 viewTag : Tag -> Html msg
-viewTag tag = span [ class "uk-label uk-border-pill", Attr.style "background" "#CCC" ] [
+viewTag tag = span [ class "uk-label uk-border-pill", Attr.style "background" "#CCC", Attr.style "margin-right" "5px" ] [
     a [ Attr.href ("/tag/" ++ (String.fromInt tag.id)) ] [ viewIcon "trash" ],
     a [ Attr.href tag.link, class "uk-link-muted" ] [ text (tag.text) ]
     ]
