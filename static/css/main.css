@@ -8,3 +8,28 @@
     border-right: 1px #e5e5e5 solid;
     overflow: auto;
 }
+
+.cocktail-header-image-container {
+    width: 380px;
+    height: 300px;
+}
+
+.cocktail-header {
+    background: #f0f0f0;
+    color: #666;
+}
+
+.cocktail-header:hover {
+    background: #666;
+    color: #f0f0f0;
+}
+
+.cocktail-body {
+    background: #f6f6f6;
+    color: #595959;
+}
+
+.cocktail-body:hover {
+    background: #595959;
+    color: #fafafa;
+}

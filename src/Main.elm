@@ -1,7 +1,8 @@
 import Browser
-import Html exposing (Html, button, div, text, nav, ul, li, a, span, img, p)
+import Html exposing (Html, button, div, text, nav, ul, li, a, span, img, p, hr)
 import Html.Events exposing (onClick)
 import Html.Attributes as Attr exposing (class, classList, src, width, height)
+import Lorem
 
 main =
   Browser.sandbox { init = 0, update = update, view = view }
@@ -66,20 +67,18 @@ type alias Image = {
         height: Int
     }
 
-viewImage : Image -> Html msg
-viewImage image = img [
+viewImage : List (String, Bool) -> Image -> Html msg
+viewImage classListExtras image = img [
         Attr.attribute "uk-img" "",
-        classList [
-            ("uk-img", True),
-            ("uk-width-1-2@m", True),
-            ("uk-border-circle", True)
-        ],
+        classList (List.append classListExtras [
+            ("uk-img", True)
+        ]),
+        Attr.style "height" ((String.fromInt image.height) ++ "px"),
+        Attr.style "width" ((String.fromInt image.width) ++ "px"),
         Attr.attribute "data-src" image.src,
         Attr.attribute "data-sizes" ("(max-width: " ++ (String.fromInt image.width) ++ "px) " ++ String.fromInt(image.width) ++ "px, (max-height: " ++ (String.fromInt image.height) ++ "px) " ++ String.fromInt(image.height) ++ "px"),
         Attr.attribute "data-width" (String.fromInt image.width),
-        Attr.attribute "data-height" (String.fromInt image.height),
-        Attr.attribute "style" ("height: " ++ (String.fromInt image.height) ++ "px;"),
-        Attr.attribute "style" ("width: " ++ (String.fromInt image.width) ++ "px;")
+        Attr.attribute "data-height" (String.fromInt image.height)
     ] []
 
 viewTag : Tag -> Html msg
@@ -150,7 +149,8 @@ type alias Tag = {
 
 type alias Ingredient = {
         name: String,
-        share: Int
+        share: Int,
+        rank: Int
     }
 
 {-|
@@ -165,7 +165,7 @@ viewIngredient ingredient = li [
         ]
     ] [
         span [ class "" ] [ text ingredient.name ],
-        span [ class "" ] [ text ((String.fromInt ingredient.share) ++ " ml") ]
+        span [ class "" ] [ text ((String.fromFloat (toFloat ingredient.share / 100 * 400)) ++ " ml") ]
     ]
 
 viewIngredientList : List Ingredient -> Html msg
@@ -177,13 +177,13 @@ defaultTag = { id = 0, text = "Tag", link = "/" }
 
 viewCocktailCard : Html msg
 viewCocktailCard = div [ Attr.attribute "style" "margin: 10px;" ] [ viewCard
-    (viewCardHeader (viewImage { src = "images/gandt.png", height = 50, width = 50 }) "Cocktail name" "/")
-    (viewIngredientList [ { name = "Tonic Water", share = 40 }, { name = "Gin", share = 60 } ])
+    (viewCardHeader (viewImage [ ("uk-border-circle", True) ] { src = "images/gandt.png", height = 50, width = 50 }) "Cocktail name" "/")
+    (viewIngredientList [ { name = "Tonic Water", share = 40, rank = 0 }, { name = "Gin", share = 60, rank = 0 } ])
     (viewCardFooter (List.repeat 5 defaultTag) ) ]
 
 viewContent : List (Html msg) -> Html msg
 viewContent contentItems =  div [
-        Attr.attribute "uk-grid" "",
+        ukGridAttribute,
         classList [
             ("uk-section", True),
             ("uk-section-default", True),
@@ -193,6 +193,103 @@ viewContent contentItems =  div [
             ("uk-flex-center", True)
         ]
     ] contentItems
+
+ukGridAttribute = Attr.attribute "uk-grid" ""
+
+viewCocktailHeader cocktail = div [
+        classList [
+            ("uk-flex", True),
+            ("uk-card", True),
+            ("uk-width-3-4", True),
+            ("uk-card-body", True),
+            ("uk-card-default", True),
+            ("cocktail-header", True)
+        ]
+    ] [
+        viewCocktailHeaderImage "images/gandt.png",
+        div [ class "uk-margin-left" ] [
+            viewCocktailHeaderName cocktail.name,
+            viewCocktailHeaderDescription cocktail.description
+        ]
+    ]
+
+viewCocktailHeaderImage link = div [
+        classList [
+            ("cocktail-header-image-container", True),
+            ("uk-inline-clip", True),
+            ("uk-transition-toggle", True)
+        ]
+    ] [
+        viewImage [ ("cocktail-header-image", True) ] { src = link, width = 300, height = 280 },
+        div [ class "uk-position-center" ] [
+            a [ Attr.href "/cocktails/<cocktail>/image" ] [
+                span [ classList [ ("uk-transition-fade", True), ("uk-box-shadow-large", True) ], Attr.style "color" "#666", Attr.attribute "uk-icon" "icon: plus; ratio: 2" ] [ ]
+            ]
+        ]
+    ]
+
+viewCocktailHeaderDescription description = div [
+        classList [
+            ("", True)
+        ]
+    ] [
+        p [ Attr.style "work-break" "break-all", class "header-description" ] [ text description ]
+    ]
+
+viewCocktailHeaderName name = div [
+        classList [
+            ("uk-heading-primary", True)
+        ]
+    ] [
+        text name
+    ]
+
+viewCocktailBody ingredients = div [
+        classList [
+            ("uk-flex", True),
+            ("uk-card", True),
+            ("uk-width-3-4", True),
+            ("uk-card-body", True),
+            ("uk-card-default", True),
+            ("cocktail-body", True),
+            ("uk-margin-top", True)
+        ]
+    ] [
+        div [
+            classList [
+                ("uk-section", True),
+                ("uk-section-default", True)
+            ]
+        ] [
+            div [ class "uk-text-center" ] [ span [ class "" ] [ text "Ingredients" ] ],
+            viewIngredientList (List.sortBy .rank ingredients)
+        ]
+    ]
+
+type alias Cocktail = {
+        name: String,
+        description: String
+    }
+
+viewCocktail cocktail = div [
+        classList [
+
+        ]
+    ] [
+        viewCocktailHeader cocktail,
+        viewCocktailBody [ { name = "1", share = 10, rank = 1 },
+                           { name = "10", share = 10, rank = 10 },
+                           { name = "0", share = 10, rank = 0 },
+                           { name = "7", share = 10, rank = 7 },
+                           { name = "5", share = 10, rank = 5 },
+                           { name = "4", share = 10, rank = 4 },
+                           { name = "6", share = 10, rank = 6 },
+                           { name = "3", share = 10, rank = 3 },
+                           { name = "8", share = 10, rank = 8 },
+                           { name = "2", share = 10, rank = 2 },
+                           { name = "9", share = 10, rank = 9 }
+                         ]
+    ]
 
 view model =
   div [
@@ -208,5 +305,20 @@ view model =
             viewHeaderItem [ text "Accessories" ] "/accessories",
             viewHeaderItem [ text "Glasses" ] "/glasses"
         ],
-        viewContent (List.repeat 20 viewCocktailCard)
+        -- viewContent (List.repeat 20 viewCocktailCard)
+        viewContent [ viewCocktail { name = "Gin & Tonic", description = (Lorem.sentence 20) } ]
     ]
+
+{-
+    { name = "1", share = 10, rank = 1 }
+    { name = "2", share = 10, rank = 10 }
+    { name = "0", share = 10, rank = 0 }
+    { name = "7", share = 10, rank = 7 }
+    { name = "5", share = 10, rank = 5 }
+    { name = "4", share = 10, rank = 4 }
+    { name = "6", share = 10, rank = 6 }
+    { name = "3", share = 10, rank = 3 }
+    { name = "8", share = 10, rank = 8 }
+    { name = "2", share = 10, rank = 2 }
+    { name = "9", share = 10, rank = 9 }
+-}
