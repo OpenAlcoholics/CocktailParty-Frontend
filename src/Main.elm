@@ -1,8 +1,11 @@
+module Main exposing (..)
+
 import Browser
 import Html exposing (Html, button, div, text, nav, ul, li, a, span, img, p, hr)
 import Html.Events exposing (onClick)
 import Html.Attributes as Attr exposing (class, classList, src, width, height)
 import Lorem
+import UIKit
 
 main =
   Browser.sandbox { init = 0, update = update, view = view }
@@ -95,6 +98,7 @@ viewTagList tagList = div [
         ]
     ] (List.map viewTag tagList)
 
+viewCardFooter : List Tag -> Html Msg
 viewCardFooter tagList = viewTagList tagList
 
 viewCardHeader : Html msg -> String -> String -> Html msg
@@ -126,7 +130,7 @@ viewCardBody bodyText = div [
 viewEmptyItem : Html msg
 viewEmptyItem = div [][]
 
-viewCard cardHeader bodyItem footerItem = div [
+{-viewCard cardHeader bodyItem footerItem = div [
         classList [
             ("uk-card", True),
             ("uk-card-default", True),
@@ -139,7 +143,10 @@ viewCard cardHeader bodyItem footerItem = div [
         cardHeader,
         bodyItem,
         footerItem
-    ]
+    ]-}
+
+-- viewCard : List (Html msg) -> List String -> List (Html.Attribute msg) -> Html msg
+viewCard children extra_classes extra_attributes = UIKit.card (["uk-card"] ++ extra_classes) [ "" ] children
 
 type alias Tag = {
         id: Int,
@@ -176,10 +183,12 @@ viewIngredientList ingredients = ul [
 defaultTag = { id = 0, text = "Tag", link = "/" }
 
 viewCocktailCard : Html msg
-viewCocktailCard = div [ Attr.attribute "style" "margin: 10px;" ] [ viewCard
-    (viewCardHeader (viewImage [ ("uk-border-circle", True) ] { src = "images/gandt.png", height = 50, width = 50 }) "Cocktail name" "/")
-    (viewIngredientList [ { name = "Tonic Water", share = 40, rank = 0 }, { name = "Gin", share = 60, rank = 0 } ])
+viewCocktailCard =  viewCard [
+    (viewCardHeader (viewImage [ ("uk-border-circle", True) ] { src = "images/gandt.png", height = 50, width = 50 }) "Cocktail name" "/"),
+    (viewIngredientList [ { name = "Tonic Water", share = 40, rank = 0 }, { name = "Gin", share = 60, rank = 0 } ]),
     (viewCardFooter (List.repeat 5 defaultTag) ) ]
+    []
+    [ Attr.attribute "style" "margin: 10px;" ]
 
 viewContent : List (Html msg) -> Html msg
 viewContent contentItems =  div [
@@ -196,7 +205,7 @@ viewContent contentItems =  div [
 
 ukGridAttribute = Attr.attribute "uk-grid" ""
 
-viewCocktailHeader cocktail = div [
+{-viewCocktailHeader cocktail = div [
         classList [
             ("uk-flex", True),
             ("uk-card", True),
@@ -211,7 +220,15 @@ viewCocktailHeader cocktail = div [
             viewCocktailHeaderName cocktail.name,
             viewCocktailHeaderDescription cocktail.description
         ]
+    ]-}
+
+viewCocktailHeader cocktail = viewCard [
+        (viewCocktailHeaderImage "images/gandt.png"),
+        (div [ class "uk-margin-left" ] [ viewCocktailHeaderName cocktail.name, viewCocktailHeaderDescription cocktail.description]),
+        (div [][])
     ]
+    ["uk-flex", "uk-width-3-4", "uk-card-default", "uk-card-body", "cocktail-header"]
+    []
 
 viewCocktailHeaderImage link = div [
         classList [
@@ -308,17 +325,3 @@ view model =
         -- viewContent (List.repeat 20 viewCocktailCard)
         viewContent [ viewCocktail { name = "Gin & Tonic", description = (Lorem.sentence 20) } ]
     ]
-
-{-
-    { name = "1", share = 10, rank = 1 }
-    { name = "2", share = 10, rank = 10 }
-    { name = "0", share = 10, rank = 0 }
-    { name = "7", share = 10, rank = 7 }
-    { name = "5", share = 10, rank = 5 }
-    { name = "4", share = 10, rank = 4 }
-    { name = "6", share = 10, rank = 6 }
-    { name = "3", share = 10, rank = 3 }
-    { name = "8", share = 10, rank = 8 }
-    { name = "2", share = 10, rank = 2 }
-    { name = "9", share = 10, rank = 9 }
--}
