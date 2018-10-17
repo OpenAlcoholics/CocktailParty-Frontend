@@ -9,6 +9,14 @@
     overflow: auto;
 }
 
+<
+<
+<
+<
+<
+<
+<
+Updated upstream
 .cocktail-header-image-container {
     width: 380px;
     height: 300px;
@@ -32,4 +40,8 @@
 .cocktail-body:hover {
     background: #595959;
     color: #fafafa;
+}
+
+.card-margin {
+    margin: 5px;
 }

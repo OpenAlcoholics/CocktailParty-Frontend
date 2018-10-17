@@ -1,11 +1,7 @@
-module Main exposing (..)
-
 import Browser
-import Html exposing (Html, button, div, text, nav, ul, li, a, span, img, p, hr)
+import Html exposing (Html, button, div, text, nav, ul, li, a, span, img, p)
 import Html.Events exposing (onClick)
 import Html.Attributes as Attr exposing (class, classList, src, width, height)
-import Lorem
-import UIKit
 
 main =
   Browser.sandbox { init = 0, update = update, view = view }
@@ -70,18 +66,18 @@ type alias Image = {
         height: Int
     }
 
-viewImage : List (String, Bool) -> Image -> Html msg
-viewImage classListExtras image = img [
+viewImage : Image -> List (String, Bool) -> Html msg
+viewImage image extra_classes = img [
         Attr.attribute "uk-img" "",
-        classList (List.append classListExtras [
+        classList ([
             ("uk-img", True)
-        ]),
-        Attr.style "height" ((String.fromInt image.height) ++ "px"),
-        Attr.style "width" ((String.fromInt image.width) ++ "px"),
-        Attr.attribute "data-src" image.src,
+        ] ++ extra_classes),
+        Attr.src image.src,
+        {-Attr.attribute "data-src" image.src,
         Attr.attribute "data-sizes" ("(max-width: " ++ (String.fromInt image.width) ++ "px) " ++ String.fromInt(image.width) ++ "px, (max-height: " ++ (String.fromInt image.height) ++ "px) " ++ String.fromInt(image.height) ++ "px"),
-        Attr.attribute "data-width" (String.fromInt image.width),
-        Attr.attribute "data-height" (String.fromInt image.height)
+        Attr.attribute "data-width" ((String.fromInt image.width) ++ "px"),
+        Attr.attribute "data-height" ((String.fromInt image.height) ++ "px"),-}
+        Attr.attribute "style" ("height: " ++ (String.fromInt image.height) ++ "px;" ++ ("width: " ++ (String.fromInt image.width) ++ "px;"))
     ] []
 
 viewTag : Tag -> Html msg
@@ -98,7 +94,6 @@ viewTagList tagList = div [
         ]
     ] (List.map viewTag tagList)
 
-viewCardFooter : List Tag -> Html Msg
 viewCardFooter tagList = viewTagList tagList
 
 viewCardHeader : Html msg -> String -> String -> Html msg
@@ -130,23 +125,16 @@ viewCardBody bodyText = div [
 viewEmptyItem : Html msg
 viewEmptyItem = div [][]
 
-{-viewCard cardHeader bodyItem footerItem = div [
-        classList [
+viewCard children extra_classes = div [
+        classList ([
             ("uk-card", True),
             ("uk-card-default", True),
             ("uk-card-body", True),
             ("uk-card-hover", True),
             ("uk-card-match", True)
-        ],
+        ] ++ extra_classes),
         Attr.style "background" "#fcfcfc"
-    ] [
-        cardHeader,
-        bodyItem,
-        footerItem
-    ]-}
-
--- viewCard : List (Html msg) -> List String -> List (Html.Attribute msg) -> Html msg
-viewCard children extra_classes extra_attributes = UIKit.card (["uk-card"] ++ extra_classes) [ "" ] children
+    ] children
 
 type alias Tag = {
         id: Int,
@@ -156,9 +144,35 @@ type alias Tag = {
 
 type alias Ingredient = {
         name: String,
-        share: Int,
-        rank: Int
+        share: Int
     }
+
+type alias IngredientCategory = {
+        id: Int,
+        name: String,
+        description: String,
+        image_link: String,
+        is_alcoholic: Bool
+    }
+
+defaultIngredientCategory = {
+        id = 1,
+        name = "Ingredient category",
+        description = "An ingredient category",
+        image_link = "https://images.unsplash.com/photo-1500087350143-69a9e170092a?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=abd759f4c7886ad4132e3e9ddd1ed375&auto=format&fit=crop&w=1950&q=80",
+        is_alcoholic = True
+    }
+
+viewIngredientCategory ingredientCategory = viewCard [
+        (div [ class "uk-card-header" ] [
+            span [ class "uk-grid-small uk-flex-middle" ] [
+                span [ class "uk-width-auto uk-flex-left" ] [ viewImage { src = ingredientCategory.image_link, height = 60, width = 60 } [ ("uk-border-circle", True) ] ],
+                span [ class "uk-width-expand uk-card-title uk-margin-remove-bottom uk-flex-right" ] [text ingredientCategory.name]
+            ]
+        ]),
+        (div [ class "uk-card-body" ] [ text ingredientCategory.description ]),
+        (div [ class "uk-card-footer" ] [ text (( if not ingredientCategory.is_alcoholic then "non-" else "") ++ "alcoholic") ])
+    ] [ ("card-margin", True) ]
 
 {-|
     Creates a list item with the given ingredient.
@@ -172,7 +186,7 @@ viewIngredient ingredient = li [
         ]
     ] [
         span [ class "" ] [ text ingredient.name ],
-        span [ class "" ] [ text ((String.fromFloat (toFloat ingredient.share / 100 * 400)) ++ " ml") ]
+        span [ class "" ] [ text ((String.fromInt ingredient.share) ++ " ml") ]
     ]
 
 viewIngredientList : List Ingredient -> Html msg
@@ -183,16 +197,14 @@ viewIngredientList ingredients = ul [
 defaultTag = { id = 0, text = "Tag", link = "/" }
 
 viewCocktailCard : Html msg
-viewCocktailCard =  viewCard [
-    (viewCardHeader (viewImage [ ("uk-border-circle", True) ] { src = "images/gandt.png", height = 50, width = 50 }) "Cocktail name" "/"),
-    (viewIngredientList [ { name = "Tonic Water", share = 40, rank = 0 }, { name = "Gin", share = 60, rank = 0 } ]),
-    (viewCardFooter (List.repeat 5 defaultTag) ) ]
-    []
-    [ Attr.attribute "style" "margin: 10px;" ]
+viewCocktailCard = div [ ] [ (viewCard [
+    (viewCardHeader (viewImage { src = "images/gandt.png", height = 50, width = 50 } [ ("uk-border-circle", True) ]) "Cocktail name" "/"),
+    (viewIngredientList [ { name = "Tonic Water", share = 40 }, { name = "Gin", share = 60 } ]),
+    (viewCardFooter (List.repeat 5 defaultTag) ) ] [] )]
 
 viewContent : List (Html msg) -> Html msg
 viewContent contentItems =  div [
-        ukGridAttribute,
+        Attr.attribute "uk-grid" "",
         classList [
             ("uk-section", True),
             ("uk-section-default", True),
@@ -202,111 +214,6 @@ viewContent contentItems =  div [
             ("uk-flex-center", True)
         ]
     ] contentItems
-
-ukGridAttribute = Attr.attribute "uk-grid" ""
-
-{-viewCocktailHeader cocktail = div [
-        classList [
-            ("uk-flex", True),
-            ("uk-card", True),
-            ("uk-width-3-4", True),
-            ("uk-card-body", True),
-            ("uk-card-default", True),
-            ("cocktail-header", True)
-        ]
-    ] [
-        viewCocktailHeaderImage "images/gandt.png",
-        div [ class "uk-margin-left" ] [
-            viewCocktailHeaderName cocktail.name,
-            viewCocktailHeaderDescription cocktail.description
-        ]
-    ]-}
-
-viewCocktailHeader cocktail = viewCard [
-        (viewCocktailHeaderImage "images/gandt.png"),
-        (div [ class "uk-margin-left" ] [ viewCocktailHeaderName cocktail.name, viewCocktailHeaderDescription cocktail.description]),
-        (div [][])
-    ]
-    ["uk-flex", "uk-width-3-4", "uk-card-default", "uk-card-body", "cocktail-header"]
-    []
-
-viewCocktailHeaderImage link = div [
-        classList [
-            ("cocktail-header-image-container", True),
-            ("uk-inline-clip", True),
-            ("uk-transition-toggle", True)
-        ]
-    ] [
-        viewImage [ ("cocktail-header-image", True) ] { src = link, width = 300, height = 280 },
-        div [ class "uk-position-center" ] [
-            a [ Attr.href "/cocktails/<cocktail>/image" ] [
-                span [ classList [ ("uk-transition-fade", True), ("uk-box-shadow-large", True) ], Attr.style "color" "#666", Attr.attribute "uk-icon" "icon: plus; ratio: 2" ] [ ]
-            ]
-        ]
-    ]
-
-viewCocktailHeaderDescription description = div [
-        classList [
-            ("", True)
-        ]
-    ] [
-        p [ Attr.style "work-break" "break-all", class "header-description" ] [ text description ]
-    ]
-
-viewCocktailHeaderName name = div [
-        classList [
-            ("uk-heading-primary", True)
-        ]
-    ] [
-        text name
-    ]
-
-viewCocktailBody ingredients = div [
-        classList [
-            ("uk-flex", True),
-            ("uk-card", True),
-            ("uk-width-3-4", True),
-            ("uk-card-body", True),
-            ("uk-card-default", True),
-            ("cocktail-body", True),
-            ("uk-margin-top", True)
-        ]
-    ] [
-        div [
-            classList [
-                ("uk-section", True),
-                ("uk-section-default", True)
-            ]
-        ] [
-            div [ class "uk-text-center" ] [ span [ class "" ] [ text "Ingredients" ] ],
-            viewIngredientList (List.sortBy .rank ingredients)
-        ]
-    ]
-
-type alias Cocktail = {
-        name: String,
-        description: String
-    }
-
-viewCocktail cocktail = div [
-        classList [
-
-        ]
-    ] [
-        viewCocktailHeader cocktail,
-        viewCocktailBody [ { name = "1", share = 10, rank = 1 },
-                           { name = "10", share = 10, rank = 10 },
-                           { name = "0", share = 10, rank = 0 },
-                           { name = "7", share = 10, rank = 7 },
-                           { name = "5", share = 10, rank = 5 },
-                           { name = "4", share = 10, rank = 4 },
-                           { name = "6", share = 10, rank = 6 },
-                           { name = "3", share = 10, rank = 3 },
-                           { name = "8", share = 10, rank = 8 },
-                           { name = "2", share = 10, rank = 2 },
-                           { name = "9", share = 10, rank = 9 }
-                         ]
-    ]
 
 view model =
   div [
@@ -323,5 +230,5 @@ view model =
             viewHeaderItem [ text "Glasses" ] "/glasses"
         ],
         -- viewContent (List.repeat 20 viewCocktailCard)
-        viewContent [ viewCocktail { name = "Gin & Tonic", description = (Lorem.sentence 20) } ]
+        viewContent (List.repeat 10 (viewIngredientCategory defaultIngredientCategory))
     ]
