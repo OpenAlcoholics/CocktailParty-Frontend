@@ -1,0 +1,35 @@
+version: 2
+jobs:
+  build:
+    docker:
+    - image: codesimple/elm:0.19
+    steps:
+    - run:
+        name: Make elm
+        command: elm make src/Main.elm --output static/main.js
+
+  deploy:
+    docker:
+    - image: circleci/python:3.7
+    # Update server image
+    steps:
+    - run:
+        name: Install aws cli
+        command: sudo pip install awscli
+    - run:
+        name: Deploy to S3
+        command: aws s3 sync static s3://opencocktail --delete
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+    - build:
+        filters:
+          branches:
+            only:
+            - develop
+            - master
+    - deploy:
+        requires:
+        - build
