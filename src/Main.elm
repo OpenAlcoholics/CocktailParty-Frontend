@@ -73,10 +73,6 @@ viewImage image extra_classes = img [
             ("uk-img", True)
         ] ++ extra_classes),
         Attr.src image.src,
-        {-Attr.attribute "data-src" image.src,
-        Attr.attribute "data-sizes" ("(max-width: " ++ (String.fromInt image.width) ++ "px) " ++ String.fromInt(image.width) ++ "px, (max-height: " ++ (String.fromInt image.height) ++ "px) " ++ String.fromInt(image.height) ++ "px"),
-        Attr.attribute "data-width" ((String.fromInt image.width) ++ "px"),
-        Attr.attribute "data-height" ((String.fromInt image.height) ++ "px"),-}
         Attr.attribute "style" ("height: " ++ (String.fromInt image.height) ++ "px;" ++ ("width: " ++ (String.fromInt image.width) ++ "px;"))
     ] []
 
