@@ -82,7 +82,6 @@ viewImage image extra_classes = img [
 
 viewTag : Tag -> Html msg
 viewTag tag = span [ class "uk-label uk-border-pill", Attr.style "background" "#CCC", Attr.style "margin-right" "5px" ] [
-    a [ Attr.href ("/tag/" ++ (String.fromInt tag.id)) ] [ viewIcon "trash" ],
     a [ Attr.href tag.link, class "uk-link-muted" ] [ text (tag.text) ]
     ]
 
@@ -229,6 +228,6 @@ view model =
             viewHeaderItem [ text "Accessories" ] "/accessories",
             viewHeaderItem [ text "Glasses" ] "/glasses"
         ],
-        -- viewContent (List.repeat 20 viewCocktailCard)
-        viewContent (List.repeat 10 (viewIngredientCategory defaultIngredientCategory))
+        viewContent (List.repeat 20 viewCocktailCard)
+        -- viewContent (List.repeat 10 (viewIngredientCategory defaultIngredientCategory))
     ]
