@@ -9,9 +9,9 @@ jobs:
         name: Make elm
         command: elm make src/Main.elm --output static/main.js
     - persist_to_workspace:
-        root: .
+        root: static
         paths:
-            - static
+            - .
 
 
   deploy:
@@ -20,7 +20,10 @@ jobs:
     # Update server image
     steps:
     - attach_workspace:
-        at: static
+        at: .
+    run:
+        name: LS
+        command: ls -R
     - run:
         name: Install aws cli
         command: sudo pip install awscli
