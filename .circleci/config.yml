@@ -9,7 +9,7 @@ jobs:
         name: Make elm
         command: elm make src/Main.elm --output static/main.js
     - persist_to_workspace:
-        root: workspace
+        root: .
         paths:
             - static
 
