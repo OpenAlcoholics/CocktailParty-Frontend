@@ -20,7 +20,7 @@ jobs:
     # Update server image
     steps:
     - attach_workspace:
-      at: static
+        at: static
     - run:
         name: Install aws cli
         command: sudo pip install awscli
