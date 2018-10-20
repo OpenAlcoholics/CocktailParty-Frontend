@@ -20,7 +20,7 @@ jobs:
     # Update server image
     steps:
     - attach_workspace:
-        at: .
+        at: static
     - run:
         name: LS
         command: ls -R
