@@ -8,13 +8,19 @@ jobs:
     - run:
         name: Make elm
         command: elm make src/Main.elm --output static/main.js
+    - persists_to_workspace:
+        root: workspace
+        paths:
+            - static
+
 
   deploy:
     docker:
     - image: circleci/python:3.7
     # Update server image
     steps:
-    - checkout
+    - attach_workspace:
+      at: .
     - run:
         name: Install aws cli
         command: sudo pip install awscli
