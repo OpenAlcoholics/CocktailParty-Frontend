@@ -31,10 +31,19 @@ jobs:
         name: Deploy to S3
         command: aws s3 sync static s3://opencocktail --delete
 
+
+    markdown_lint:
+        docker:
+        - image: 06kellyjac/markdownlint-cli:0.13.0-alpine
+        steps:
+        - checkout
+        - run: markdownlint README.md
+
 workflows:
   version: 2
   build_and_deploy:
     jobs:
+    - markdown_lint
     - build:
         filters:
           branches:
