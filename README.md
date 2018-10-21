@@ -1,4 +1,4 @@
-# elm_test
+# CocktailParty-Frontend
 
 ## Compile
 
