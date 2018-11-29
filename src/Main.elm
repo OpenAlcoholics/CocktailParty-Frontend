@@ -1,5 +1,5 @@
 import Browser
-import Html exposing (Html, button, div, text, nav, ul, li, a, span, img, p)
+import Html exposing (Html, button, div, text, nav, ul, li, a, span, img, p, hr, dd, h1, form, input, select, option)
 import Html.Events exposing (onClick)
 import Html.Attributes as Attr exposing (class, classList, src, width, height)
 
@@ -82,14 +82,13 @@ viewImage image extra_classes = img [
 
 viewTag : Tag -> Html msg
 viewTag tag = span [ class "uk-label uk-border-pill", Attr.style "background" "#CCC", Attr.style "margin-right" "5px" ] [
-    a [ Attr.href ("/tag/" ++ (String.fromInt tag.id)) ] [ viewIcon "trash" ],
-    a [ Attr.href tag.link, class "uk-link-muted" ] [ text (tag.text) ]
+    a [ Attr.href tag.link, class "uk-link-muted" ] [ text (tag.text) ],
+    a [ Attr.href ("/tag/" ++ (String.fromInt tag.id)) ] [ viewIcon "trash" ]
     ]
 
 viewTagList : List Tag -> Html msg
 viewTagList tagList = div [
         classList [
-            ("uk-card-footer", True),
             ("uk-flex", True)
         ]
     ] (List.map viewTag tagList)
@@ -192,15 +191,234 @@ viewIngredient ingredient = li [
 viewIngredientList : List Ingredient -> Html msg
 viewIngredientList ingredients = ul [
         class "uk-flex uk-flex-column uk-column-1-2"
-    ] (List.map viewIngredient ingredients)
+    ] [
+        text (String.join ", " (List.map (\ingredient -> ingredient.name) ingredients))
+    ]
 
 defaultTag = { id = 0, text = "Tag", link = "/" }
 
 viewCocktailCard : Html msg
 viewCocktailCard = div [ ] [ (viewCard [
     (viewCardHeader (viewImage { src = "images/gandt.png", height = 50, width = 50 } [ ("uk-border-circle", True) ]) "Cocktail name" "/"),
-    (viewIngredientList [ { name = "Tonic Water", share = 40 }, { name = "Gin", share = 60 } ]),
+    (viewIngredientList [ { name = "Gin", share = 60 }, { name = "Tonic Water", share = 40 } ]),
     (viewCardFooter (List.repeat 5 defaultTag) ) ] [] )]
+
+viewCocktailDetailHeader = div [
+        classList [
+            ("uk-card-media-left", True)
+        ]
+    ] [
+        (viewImage { src = "images/gandt.png", height = 350, width = 400} [ ("uk-align-center uk-align-left uk-margin-remove-adjacent", True) ]),
+        div [
+            classList [
+            ]
+        ] [
+            span [ classList [ ("uk-heading-hero", True), ("", True) ] ] [ text "Gin & Tonic" ],
+            hr [ Attr.style "width" "100%" ] [],
+            dd [ classList [ ("", True) ] ] [ text "Classic and easy, the gin and tonic is light and refreshing. It is a simple mixed drink—requiring just the two ingredients—and is perfect for happy hour, dinner, or anytime you simply want an invigorating beverage." ],
+            hr [] [],
+            viewTagList (List.repeat 5 defaultTag)
+        ]
+    ]
+
+viewCocktailDetailBody = div [
+        classList [
+            ("uk-card", True),
+            ("uk-grid", True),
+            ("uk-child-width-1-2", True)
+        ]
+    ] [
+        div [
+
+        ] [
+            div [
+            ] [
+                div [
+                    classList [
+
+                    ]
+                ] [
+                    h1 [ classList [ ("uk-heading-line", True) ] ] [ span [] [ text "Ingredients" ] ],
+                    div [
+                        Attr.attribute "uk-grid" "",
+                        classList [
+                            ("uk-grid", True)
+                        ]
+                    ] [
+                        form [
+                            classList [
+                                ("uk-grid", True)
+                            ]
+                        ] [
+                            div [
+                                Attr.style "text-align" "center",
+                                classList [
+                                    ("uk-width-1-3", True)
+                                ]
+                            ] [
+                                text "Amount",
+                                input [
+                                    Attr.attribute "type" "number",
+                                    classList [
+                                        ("uk-input", True)
+                                    ],
+                                    Attr.value "1"
+                                ] [
+                                    text "Hey"
+                                ]
+                            ],
+                            div [
+                                Attr.style "text-align" "center",
+                                classList [
+                                    ("uk-width-1-3", True)
+                                ]
+                            ] [
+                                text "Size",
+                                input [
+                                    Attr.attribute "type" "number",
+                                    classList [
+                                        ("uk-input", True)
+                                    ],
+                                    Attr.value "300"
+                                ] []
+                            ],
+                            div [
+                                Attr.style "text-align" "center",
+                                classList [
+                                    ("uk-width-1-3", True)
+                                ]
+                            ] [
+                                text "Unit",
+                                select [
+                                    classList [
+                                        ("uk-select", True)
+                                    ]
+                                ] [
+                                    option [] [ text "ml" ],
+                                    option [] [ text "oz" ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                hr [] [],
+                div [
+                    classList [
+                        ("uk-grid", True),
+                        ("uk-grid-divider", True),
+                        ("uk-child-width-1-2", True)
+                    ]
+                ] [
+                    div [
+                        Attr.style "text-align" "center",
+                        classList [
+                            ("uk-flex-center", True),
+                            ("uk-margin-top", True)
+                        ]
+                    ] [
+                        text "Gin"
+                    ],
+                    div [
+                        Attr.style "text-align" "center",
+                        classList [
+                            ("uk-flex-center", True),
+                            ("uk-margin", True)
+                        ]
+                    ] [
+                        text "50ml"
+                    ],
+                    div [
+                        Attr.style "text-align" "center",
+                        classList [
+                            ("uk-flex-center", True),
+                            ("uk-margin", True)
+                        ]
+                    ] [
+                        text "Tonic Water"
+                    ],
+                    div [
+                        Attr.style "text-align" "center",
+                        classList [
+                            ("uk-flex-center", True),
+                            ("uk-margin", True)
+                        ]
+                    ] [
+                        text "50ml"
+                    ],
+                    div [
+                        Attr.style "text-align" "center",
+                        classList [
+                            ("uk-flex-center", True),
+                            ("uk-margin", True)
+                        ]
+                    ] [
+                        text "Ice cube"
+                    ],
+                    div [
+                        Attr.style "text-align" "center",
+                        classList [
+                            ("uk-flex-center", True),
+                            ("uk-margin", True)
+                        ]
+                    ] [
+                        text "6 pieces"
+                    ],
+                    div [
+                        Attr.style "text-align" "center",
+                        classList [
+                            ("uk-flex-center", True),
+                            ("uk-margin", True)
+                        ]
+                    ] [
+                        text "Apple slice"
+                    ],
+                    div [
+                        Attr.style "text-align" "center",
+                        classList [
+                            ("uk-flex-center", True),
+                            ("uk-margin", True)
+                        ]
+                    ] [
+                        text "2 pieces"
+                    ]
+                ]
+            ]
+        ],
+        div [
+            classList [
+            ]
+        ] [
+            h1 [ classList [ ("uk-heading-line", True) ] ] [ span [] [ text "Instructions" ] ],
+            span [
+                classList [
+                    ("uk-margin-top", True)
+                ]
+            ] [
+                text "Classic and easy, the gin and tonic is light and refreshing. It is a simple mixed drink—requiring just the two ingredients—and is perfect for happy hour, dinner, or anytime you simply want an invigorating beverage."
+            ]
+        ]
+    ]
+
+viewCocktailDetail : Html msg
+viewCocktailDetail = div [ ] [
+        viewCard [
+            viewCocktailDetailHeader
+        ] [ ("uk-container", True), ("uk-box-shadow-xlarge", True) ],
+        viewCard [
+            viewCocktailDetailBody
+        ] [ ("uk-container", True), ("uk-margin", True), ("uk-box-shadow-medium", True) ]
+    ]
+
+viewFooter = div [
+        Attr.attribute "uk-sticky" "bottom: true",
+        classList [
+            ("uk-background-secondary", True),
+            ("uk-flex", True),
+            ("uk-flex-center", True)
+        ]
+    ] [
+        a [ Attr.href "https://github.com/OpenAlcoholics/CocktailParty-Frontend" ] [ viewIcon "github-alt" ]
+    ]
 
 viewContent : List (Html msg) -> Html msg
 viewContent contentItems =  div [
@@ -229,6 +447,8 @@ view model =
             viewHeaderItem [ text "Accessories" ] "/accessories",
             viewHeaderItem [ text "Glasses" ] "/glasses"
         ],
+        viewContent [ viewCocktailDetail ],
         -- viewContent (List.repeat 20 viewCocktailCard)
-        viewContent (List.repeat 10 (viewIngredientCategory defaultIngredientCategory))
+        -- viewContent (List.repeat 10 (viewIngredientCategory defaultIngredientCategory))
+        viewFooter
     ]
