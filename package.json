@@ -1,0 +1,26 @@
+{
+  "name": "opencoktailparty-frontend",
+  "version": "0.1.0",
+  "description": "",
+  "main": "src/main.js",
+  "dependencies": {
+    "elm": "^0.19.0-bugfix2",
+    "elm-serve": "^0.3.1"
+  },
+  "devDependencies": {
+  },
+  "scripts": {
+    "build": "elm make ./src/Main.elm --output static/app.js",
+    "serve": "./node_modules/.bin/elm-serve -d static"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenAlcoholics/OpenCocktail-Frontend.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/OpenAlcoholics/OpenCocktail-Frontend/issues"
+  },
+  "homepage": "https://github.com/OpenAlcoholics/OpenCocktail-Frontend#readme"
+}
