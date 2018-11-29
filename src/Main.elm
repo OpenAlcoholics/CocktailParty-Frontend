@@ -1,14 +1,66 @@
 import Browser
+import Browser.Navigation
+import Browser.Navigation exposing (Key)
 import Html exposing (Html, button, div, text, nav, ul, li, a, span, img, p, hr, dd, h1, form, input, select, option)
 import Html.Events exposing (onClick)
 import Html.Attributes as Attr exposing (class, classList, src, width, height)
 
+import Routing exposing (pathFor)
+import Shared exposing (..)
+import Url exposing (Url)
+
+type alias Flags =
+    {}
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
+
+init : Flags -> Url -> Key -> ( Model, Cmd Msg )
+init flags url key =
+    let
+        currentRoute =
+            Routing.parseUrl url
+    in
+    ( initialModel currentRoute key, Cmd.none )
+
+main : Program Flags Model Msg
 main =
-  Browser.sandbox { init = 0, update = update, view = view }
+    Browser.application {
+        init = init,
+        update = update,
+        view = view,
+        subscriptions = subscriptions,
+        onUrlRequest = OnUrlRequest,
+        onUrlChange = OnUrlChange
+      }
 
-type Msg = Increment | Decrement
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        OnFetchCocktail (Ok cocktailId) ->
+            ( { model | route = (CocktailDetail cocktailId) }, Cmd.none )
+        OnFetchCocktail (Err _) ->
+            ( { model | route = Error "404"}, Cmd.none )
+        OnUrlRequest urlRequest ->
+            case urlRequest of
+                Browser.Internal url ->
+                    ( model
+                    , Browser.Navigation.pushUrl model.key (Url.toString url)
+                    )
 
-update msg model = 1
+                Browser.External url ->
+                    ( model
+                    , Browser.Navigation.load url
+                    )
+
+        OnUrlChange url ->
+            let
+                newRoute =
+                    Routing.parseUrl url
+            in
+            ( { model | route = newRoute }, Cmd.none )
+
 
 viewHeader : List (Html msg) -> Html msg
 viewHeader itemList = nav
@@ -199,7 +251,7 @@ defaultTag = { id = 0, text = "Tag", link = "/" }
 
 viewCocktailCard : Html msg
 viewCocktailCard = div [ ] [ (viewCard [
-    (viewCardHeader (viewImage { src = "images/gandt.png", height = 50, width = 50 } [ ("uk-border-circle", True) ]) "Cocktail name" "/"),
+    (viewCardHeader (viewImage { src = "images/gandt.png", height = 50, width = 50 } [ ("uk-border-circle", True) ]) "Cocktail name" "/cocktail/1"),
     (viewIngredientList [ { name = "Gin", share = 60 }, { name = "Tonic Water", share = 40 } ]),
     (viewCardFooter (List.repeat 5 defaultTag) ) ] [] )]
 
@@ -433,22 +485,75 @@ viewContent contentItems =  div [
         ]
     ] contentItems
 
+view : Model -> Browser.Document Msg
 view model =
-  div [
-        classList [
-            ("elm", True)
-        ]
-    ]
-    [
-        viewHeader [
-            viewHeaderItem [ viewHeaderLogo "images/logo.svg" ] "/",
-            viewHeaderItem [ text "Drinks" ] "/drinks",
-            viewHeaderItem [ text "Ingredients" ] "/ingredients",
-            viewHeaderItem [ text "Accessories" ] "/accessories",
-            viewHeaderItem [ text "Glasses" ] "/glasses"
-        ],
-        viewContent [ viewCocktailDetail ],
-        -- viewContent (List.repeat 20 viewCocktailCard)
-        -- viewContent (List.repeat 10 (viewIngredientCategory defaultIngredientCategory))
-        viewFooter
-    ]
+    case model.route of
+        Homepage ->
+            {
+                title = "Opencocktails",
+                body = [
+                    div [
+                        classList [
+                            ("elm", True)
+                        ]
+                    ]
+                    [
+                        viewHeader [
+                            viewHeaderItem [ viewHeaderLogo "images/logo.svg" ] "/",
+                            viewHeaderItem [ text "Drinks" ] "/drinks",
+                            viewHeaderItem [ text "Ingredients" ] "/ingredients",
+                            viewHeaderItem [ text "Accessories" ] "/accessories",
+                            viewHeaderItem [ text "Glasses" ] "/glasses"
+                        ],
+                        -- viewContent [ viewCocktailDetail ],
+                        viewContent (List.repeat 20 viewCocktailCard),
+                        -- viewContent (List.repeat 10 (viewIngredientCategory defaultIngredientCategory)),
+                        viewFooter
+                    ]]
+            }
+        CocktailDetail id ->
+            {
+                title = "Opencocktails",
+                body = [
+                    div [
+                        classList [
+                            ("elm", True)
+                        ]
+                    ]
+                    [
+                        viewHeader [
+                            viewHeaderItem [ viewHeaderLogo "images/logo.svg" ] "/",
+                            viewHeaderItem [ text "Drinks" ] "/drinks",
+                            viewHeaderItem [ text "Ingredients" ] "/ingredients",
+                            viewHeaderItem [ text "Accessories" ] "/accessories",
+                            viewHeaderItem [ text "Glasses" ] "/glasses"
+                        ],
+                        viewContent [ viewCocktailDetail ],
+                        -- viewContent (List.repeat 20 viewCocktailCard)
+                        -- viewContent (List.repeat 10 (viewIngredientCategory defaultIngredientCategory))
+                        viewFooter
+                    ]]
+            }
+        Error code ->
+            {
+                title = "Not found",
+                body = [
+                    div [
+                        classList [
+                            ("elm", True)
+                        ]
+                    ]
+                    [
+                        viewHeader [
+                            viewHeaderItem [ viewHeaderLogo "images/logo.svg" ] "/",
+                            viewHeaderItem [ text "Drinks" ] "/drinks",
+                            viewHeaderItem [ text "Ingredients" ] "/ingredients",
+                            viewHeaderItem [ text "Accessories" ] "/accessories",
+                            viewHeaderItem [ text "Glasses" ] "/glasses"
+                        ],
+                        viewContent [ span [] [text "404 - Not found" ] ],
+                        -- viewContent (List.repeat 20 viewCocktailCard)
+                        -- viewContent (List.repeat 10 (viewIngredientCategory defaultIngredientCategory))
+                        viewFooter
+                    ]]
+            }
