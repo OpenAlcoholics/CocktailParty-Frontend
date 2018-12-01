@@ -290,19 +290,19 @@ viewCocktailDetailHeader = div [
 viewCocktailDetailBodyIngredient : Ingredient -> String -> List (Html msg)
 viewCocktailDetailBodyIngredient ingredient unit = [
         div [
-            Attr.style "text-align" "center",
             classList [
                 ("uk-flex-center", True),
-                ("uk-margin-top", True)
+                ("uk-margin-top", True),
+                ("uk-text-right", True)
             ]
         ] [
             text ingredient.name
         ],
         div [
-            Attr.style "text-align" "center",
             classList [
                 ("uk-flex-center", True),
-                ("uk-margin", True)
+                ("uk-margin", True),
+                ("uk-text-left", True)
             ]
         ] [
             text ((String.fromInt ingredient.share) ++ unit)
@@ -315,7 +315,8 @@ viewCocktailDetailBodyAccessory accessory = [
             Attr.style "text-align" "center",
             classList [
                 ("uk-flex-center", True),
-                ("uk-margin-top", True)
+                ("uk-margin-top", True),
+                ("uk-text-right", True)
             ]
         ] [
             text accessory.name
@@ -324,7 +325,8 @@ viewCocktailDetailBodyAccessory accessory = [
             Attr.style "text-align" "center",
             classList [
                 ("uk-flex-center", True),
-                ("uk-margin", True)
+                ("uk-margin", True),
+                ("uk-text-left", True)
             ]
         ] [
             text (String.fromInt accessory.amount)
@@ -386,19 +388,19 @@ viewCocktailDetailBody cocktail = div [
                 (List.foldr (++) [] (List.map (\a -> viewCocktailDetailBodyAccessory a) cocktail.accessories)) ++
                 [
                     div [
-                            Attr.style "text-align" "center",
                             classList [
                                 ("uk-flex-center", True),
-                                ("uk-margin-top", True)
+                                ("uk-margin-top", True),
+                                ("uk-text-right", True)
                             ]
                         ] [
                             text "Ice cubes"
                         ],
                         div [
-                            Attr.style "text-align" "center",
                             classList [
                                 ("uk-flex-center", True),
-                                ("uk-margin", True)
+                                ("uk-margin", True),
+                                ("uk-text-left", True)
                             ]
                         ] [
                             text (String.fromInt cocktail.ice_cubes)
