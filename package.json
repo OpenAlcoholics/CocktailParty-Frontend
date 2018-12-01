@@ -10,7 +10,7 @@
   "devDependencies": {
   },
   "scripts": {
-    "build": "elm make ./src/Main.elm --output static/app.js",
+    "build": "elm make ./src/Main.elm --output static/main.js",
     "serve": "./node_modules/.bin/elm-serve -d static"
   },
   "repository": {
