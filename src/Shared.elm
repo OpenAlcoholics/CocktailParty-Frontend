@@ -7,14 +7,51 @@ import Url exposing (Url)
 
 type Msg
     = OnFetchCocktail (Result Http.Error CocktailId)
+    | OnFetchIngredient (Result Http.Error IngredientId)
+    | OnFetchTag (Result Http.Error TagId)
     | OnUrlChange Url
     | OnUrlRequest UrlRequest
 
 type Route
     = Homepage
     | CocktailDetail CocktailId
+    | TagDetail TagId
+    | IngredientDetail IngredientId
     | Error ErrorCode
 
+type alias Tag = {
+        id: Int,
+        text: String,
+        link: String
+    }
+
+type alias Accessory = {
+        name: String,
+        id: Int,
+        amount: Int
+    }
+
+type alias Ingredient = {
+        id: Int,
+        name: String,
+        share: Int
+    }
+
+type alias IngredientCategory = {
+        id: Int,
+        name: String,
+        description: String,
+        image_link: String,
+        is_alcoholic: Bool
+    }
+
+type alias Cocktail = {
+        id: Int,
+        name: String,
+        ingredients: List Ingredient,
+        accessories: List Accessory,
+        ice_cubes: Int
+    }
 
 type alias Model = {
         key : Key,
@@ -22,10 +59,16 @@ type alias Model = {
     }
 
 type alias CocktailId =
-    String
+    Int
+
+type alias IngredientId =
+    Int
+
+type alias TagId =
+    Int
 
 type alias ErrorCode =
-    String
+    Int
 
 initialModel : Route -> Key -> Model
 initialModel route key =

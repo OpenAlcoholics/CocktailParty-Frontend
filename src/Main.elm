@@ -41,7 +41,21 @@ update msg model =
         OnFetchCocktail (Ok cocktailId) ->
             ( { model | route = (CocktailDetail cocktailId) }, Cmd.none )
         OnFetchCocktail (Err _) ->
-            ( { model | route = Error "404"}, Cmd.none )
+            ( { model | route = Error 404}, Cmd.none )
+        OnFetchIngredient (Ok ingredientId) ->
+            ( { model | route = (IngredientDetail ingredientId) }, Cmd.none )
+        OnFetchIngredient (Err _) ->
+            ( { model | route = Error 404}, Cmd.none )
+        OnFetchTag (Ok tagId) ->
+            ( { model | route = (TagDetail tagId) }, Cmd.none )
+        OnFetchTag (Err _) ->
+            ( { model | route = Error 404}, Cmd.none )
+        OnUrlChange url ->
+            let
+                newRoute =
+                    Routing.parseUrl url
+            in
+            ( { model | route = newRoute }, Cmd.none )
         OnUrlRequest urlRequest ->
             case urlRequest of
                 Browser.Internal url ->
@@ -534,6 +548,10 @@ view model =
                         viewFooter
                     ]]
             }
+        IngredientDetail _ ->
+            { title = "Not found", body = [ view404 ] }
+        TagDetail _ ->
+            { title = "Not found", body = [ view404 ] }
         Error code ->
             {
                 title = "Not found",
