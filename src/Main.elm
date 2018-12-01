@@ -455,6 +455,14 @@ viewContent contentItems =  div [
         ]
     ] contentItems
 
+defaultHeaderItems = [
+                    [ viewHeaderLogo "/images/logo.svg" ] "/",
+                    viewHeaderItem [ text "Drinks" ] "/",
+                    viewHeaderItem [ text "Ingredients" ] "/ingredients",
+                    viewHeaderItem [ text "Accessories" ] "/accessories",
+                    viewHeaderItem [ text "Glasses" ] "/glasses"
+                ]
+
 view404 : Html msg
 view404 = div [
         classList [
@@ -462,13 +470,7 @@ view404 = div [
         ]
     ]
     [
-        viewHeader [
-        viewHeaderItem [ viewHeaderLogo "/images/logo.svg" ] "/",
-        viewHeaderItem [ text "Drinks" ] "/",
-        viewHeaderItem [ text "Ingredients" ] "/ingredients",
-        viewHeaderItem [ text "Accessories" ] "/accessories",
-        viewHeaderItem [ text "Glasses" ] "/glasses"
-    ],
+        viewHeader defaultHeaderItems,
         viewContent [ span [] [text "404 - Not found" ] ],
         -- viewContent (List.repeat 20 viewCocktailCard)
         -- viewContent (List.repeat 10 (viewIngredientCategory defaultIngredientCategory))
@@ -488,13 +490,7 @@ view model =
                         ]
                     ]
                     [
-                        viewHeader [
-                            viewHeaderItem [ viewHeaderLogo "/images/logo.svg" ] "/",
-                            viewHeaderItem [ text "Drinks" ] "/",
-                            viewHeaderItem [ text "Ingredients" ] "/ingredients",
-                            viewHeaderItem [ text "Accessories" ] "/accessories",
-                            viewHeaderItem [ text "Glasses" ] "/glasses"
-                        ],
+                        viewHeader defaultHeaderItems,
                         -- viewContent [ viewCocktailDetail ],
                         viewContent (List.repeat 20 (viewCocktailCard defaultCocktail)),
                         -- viewContent (List.repeat 10 (viewIngredientCategory defaultIngredientCategory)),
