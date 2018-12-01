@@ -442,7 +442,7 @@ viewFooter = div [
         a [ Attr.href "https://github.com/OpenAlcoholics/CocktailParty-Frontend" ] [ viewIcon "github-alt" ]
     ]
 
-viewContent : List (Html msg) -> Html msg
+viewContent : List (Html Msg) -> Html Msg
 viewContent contentItems =  div [
         Attr.attribute "uk-grid" "",
         classList [
@@ -455,15 +455,16 @@ viewContent contentItems =  div [
         ]
     ] contentItems
 
+defaultHeaderItems : List (Html Msg)
 defaultHeaderItems = [
-                    [ viewHeaderLogo "/images/logo.svg" ] "/",
+                    viewHeaderItem [ viewHeaderLogo "/images/logo.svg" ] "/",
                     viewHeaderItem [ text "Drinks" ] "/",
                     viewHeaderItem [ text "Ingredients" ] "/ingredients",
                     viewHeaderItem [ text "Accessories" ] "/accessories",
                     viewHeaderItem [ text "Glasses" ] "/glasses"
                 ]
 
-view404 : Html msg
+view404 : Html Msg
 view404 = div [
         classList [
             ("elm", True)
@@ -507,13 +508,7 @@ view model =
                         ]
                     ]
                     [
-                        viewHeader [
-                            viewHeaderItem [ viewHeaderLogo "/images/logo.svg" ] "/",
-                            viewHeaderItem [ text "Drinks" ] "/",
-                            viewHeaderItem [ text "Ingredients" ] "/ingredients",
-                            viewHeaderItem [ text "Accessories" ] "/accessories",
-                            viewHeaderItem [ text "Glasses" ] "/glasses"
-                        ],
+                        viewHeader defaultHeaderItems,
                         viewContent [ viewCocktailDetail ],
                         -- viewContent (List.repeat 20 viewCocktailCard)
                         -- viewContent (List.repeat 10 (viewIngredientCategory defaultIngredientCategory))
