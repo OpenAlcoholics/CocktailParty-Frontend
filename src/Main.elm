@@ -68,13 +68,6 @@ update msg model =
                     , Browser.Navigation.load url
                     )
 
-        OnUrlChange url ->
-            let
-                newRoute =
-                    Routing.parseUrl url
-            in
-            ( { model | route = newRoute }, Cmd.none )
-
 
 viewHeader : List (Html msg) -> Html msg
 viewHeader itemList = nav
@@ -148,8 +141,8 @@ viewImage image extra_classes = img [
 
 viewTag : Tag -> Html msg
 viewTag tag = span [ class "uk-label uk-border-pill", Attr.style "background" "#CCC", Attr.style "margin-right" "5px" ] [
-    a [ Attr.href tag.link, class "uk-link-muted" ] [ text (tag.text) ],
-    a [ Attr.href ("/tag/" ++ (String.fromInt tag.id)) ] [ viewIcon "trash" ]
+    a [ Attr.href (pathFor (TagDetail tag.id)), Attr.style "color" "#666", class "uk-link-muted" ] [ text (tag.text) ],
+    a [ Attr.href (pathFor (TagDetail tag.id)) ] [ viewIcon "trash" ]
     ]
 
 viewTagList : List Tag -> Html msg
@@ -161,14 +154,14 @@ viewTagList tagList = div [
 
 viewCardFooter tagList = viewTagList tagList
 
-viewCardHeader : Html msg -> String -> String -> Html msg
-viewCardHeader iconItem headerText link = div [
+viewCocktailCardHeader : Html msg -> String -> String -> Html msg
+viewCocktailCardHeader iconItem headerText link = div [
         classList [
             ("uk-card-header", True),
             ("uk-padding-small", True)
         ]
     ] [
-        iconItem,
+        a [ Attr.href (pathFor (CocktailDetail 0)) ] [ iconItem ],
         (viewCardTitle headerText link)
     ]
 
@@ -176,9 +169,10 @@ viewCardTitle : String -> String -> Html msg
 viewCardTitle titleText link = span [
         classList [
             ("uk-heading-primary", True),
+            ("uk-link", True),
             ("uk-card-title", True)
         ]
-    ] [ a [ Attr.href link, class "uk-link", Attr.style "color" "black", Attr.style "margin-left" "10px" ] [ text titleText ] ]
+    ] [ a [ Attr.href link, class "uk-link uk-link-muted uk-margin-left" ] [ text titleText ] ]
 
 viewCardBody : String -> Html msg
 viewCardBody bodyText = div [
@@ -200,25 +194,6 @@ viewCard children extra_classes = div [
         ] ++ extra_classes),
         Attr.style "background" "#fcfcfc"
     ] children
-
-type alias Tag = {
-        id: Int,
-        text: String,
-        link: String
-    }
-
-type alias Ingredient = {
-        name: String,
-        share: Int
-    }
-
-type alias IngredientCategory = {
-        id: Int,
-        name: String,
-        description: String,
-        image_link: String,
-        is_alcoholic: Bool
-    }
 
 defaultIngredientCategory = {
         id = 1,
@@ -254,32 +229,57 @@ viewIngredient ingredient = li [
         span [ class "" ] [ text ((String.fromInt ingredient.share) ++ " ml") ]
     ]
 
-viewIngredientList : List Ingredient -> Html msg
+joinHtmlTagListByElement : List (Html Msg) -> Html Msg -> List (Html Msg)
+joinHtmlTagListByElement list e = case list of
+    first :: [] ->
+        [ first ]
+    first :: rest ->
+            first :: (e :: (joinHtmlTagListByElement rest e))
+    [] -> [ ]
+
+viewIngredientList : List Ingredient -> Html Msg
 viewIngredientList ingredients = ul [
-        class "uk-flex uk-flex-column uk-column-1-2"
-    ] [
-        text (String.join ", " (List.map (\ingredient -> ingredient.name) ingredients))
-    ]
+        class "uk-flex uk-flex-column uk-column-1-2 uk-display-inline-block"
+    ] (joinHtmlTagListByElement (List.map (\ingredient ->
+                a [ Attr.href (pathFor (IngredientDetail ingredient.id)), class "uk-link-muted" ] [ text ingredient.name ]
+            ) ingredients) (text ", "))
 
 defaultTag = { id = 0, text = "Tag", link = "/" }
 
-viewCocktailCard : Html msg
-viewCocktailCard = div [ ] [ (viewCard [
-    (viewCardHeader (viewImage { src = "images/gandt.png", height = 50, width = 50 } [ ("uk-border-circle", True) ]) "Cocktail name" "/cocktail/1"),
-    (viewIngredientList [ { name = "Gin", share = 60 }, { name = "Tonic Water", share = 40 } ]),
-    (viewCardFooter (List.repeat 5 defaultTag) ) ] [] )]
+defaultCocktail : Cocktail
+defaultCocktail = {
+        id = 0,
+        name = "Gin & Tonic",
+        ingredients = [
+            { id = 0, name = "Gin", share = 60 },
+            { id = 1, name = "Tonic Water", share = 40 }
+        ],
+        accessories = [
+            { name = "Apple slice", id = 0, amount = 2 }
+        ],
+        ice_cubes = 6
+    }
+
+viewCocktailCard : Cocktail -> Html Msg
+viewCocktailCard cocktail = div [ ] [
+        viewCard [
+            (viewCocktailCardHeader (viewImage { src = "/images/gandt.png", height = 50, width = 50 } [ ("uk-border-circle", True) ]) cocktail.name (pathFor (CocktailDetail cocktail.id))),
+            (viewIngredientList cocktail.ingredients),
+            (viewCardFooter (List.repeat 5 defaultTag))
+        ] []
+    ]
 
 viewCocktailDetailHeader = div [
         classList [
             ("uk-card-media-left", True)
         ]
     ] [
-        (viewImage { src = "images/gandt.png", height = 350, width = 400} [ ("uk-align-center uk-align-left uk-margin-remove-adjacent", True) ]),
+        (viewImage { src = "/images/gandt.png", height = 350, width = 400} [ ("uk-align-center uk-align-left uk-margin-remove-adjacent", True) ]),
         div [
             classList [
             ]
         ] [
-            span [ classList [ ("uk-heading-hero", True), ("", True) ] ] [ text "Gin & Tonic" ],
+            a [ Attr.href (pathFor (CocktailDetail 0)), classList [ ("uk-heading-hero", True), ("uk-link-heading", True), ("uk-link-reset", True) ] ] [ text "Gin & Tonic" ],
             hr [ Attr.style "width" "100%" ] [],
             dd [ classList [ ("", True) ] ] [ text "Classic and easy, the gin and tonic is light and refreshing. It is a simple mixed drink—requiring just the two ingredients—and is perfect for happy hour, dinner, or anytime you simply want an invigorating beverage." ],
             hr [] [],
@@ -287,7 +287,51 @@ viewCocktailDetailHeader = div [
         ]
     ]
 
-viewCocktailDetailBody = div [
+viewCocktailDetailBodyIngredient : Ingredient -> String -> List (Html msg)
+viewCocktailDetailBodyIngredient ingredient unit = [
+        div [
+            Attr.style "text-align" "center",
+            classList [
+                ("uk-flex-center", True),
+                ("uk-margin-top", True)
+            ]
+        ] [
+            text ingredient.name
+        ],
+        div [
+            Attr.style "text-align" "center",
+            classList [
+                ("uk-flex-center", True),
+                ("uk-margin", True)
+            ]
+        ] [
+            text ((String.fromInt ingredient.share) ++ unit)
+        ]
+    ]
+
+viewCocktailDetailBodyAccessory : Accessory -> List (Html msg)
+viewCocktailDetailBodyAccessory accessory = [
+        div [
+            Attr.style "text-align" "center",
+            classList [
+                ("uk-flex-center", True),
+                ("uk-margin-top", True)
+            ]
+        ] [
+            text accessory.name
+        ],
+        div [
+            Attr.style "text-align" "center",
+            classList [
+                ("uk-flex-center", True),
+                ("uk-margin", True)
+            ]
+        ] [
+            text (String.fromInt accessory.amount)
+        ]
+    ]
+
+viewCocktailDetailBody cocktail = div [
         classList [
             ("uk-card", True),
             ("uk-grid", True),
@@ -313,56 +357,19 @@ viewCocktailDetailBody = div [
                     ] [
                         form [
                             classList [
-                                ("uk-grid", True)
+                                ("uk-width-expand", True),
+                                ("uk-form-horizontal", True)
                             ]
                         ] [
-                            div [
-                                Attr.style "text-align" "center",
-                                classList [
-                                    ("uk-width-1-3", True)
-                                ]
+                            span [ classList [ ("uk-width-1-5", True), ("uk-margin-right", True) ] ] [ text "For"],
+                            input [ Attr.value (String.fromInt 1), classList [ ("uk-width-small", True), ("uk-margin-right", True), ("uk-input", True), ("uk-text-center", True) ] ] [  ],
+                            span [ classList [ ("uk-width-1-6", True), ("uk-margin-right", True) ] ] [ text "portion of"],
+                            input [ Attr.value (String.fromInt 300), classList [ ("uk-width-1-6", True), ("uk-input", True), ("uk-text-center", True) ] ] [],
+                            select [
+                                classList [ ("uk-width-auto", True), ("uk-select", True) ]
                             ] [
-                                text "Amount",
-                                input [
-                                    Attr.attribute "type" "number",
-                                    classList [
-                                        ("uk-input", True)
-                                    ],
-                                    Attr.value "1"
-                                ] [
-                                    text "Hey"
-                                ]
-                            ],
-                            div [
-                                Attr.style "text-align" "center",
-                                classList [
-                                    ("uk-width-1-3", True)
-                                ]
-                            ] [
-                                text "Size",
-                                input [
-                                    Attr.attribute "type" "number",
-                                    classList [
-                                        ("uk-input", True)
-                                    ],
-                                    Attr.value "300"
-                                ] []
-                            ],
-                            div [
-                                Attr.style "text-align" "center",
-                                classList [
-                                    ("uk-width-1-3", True)
-                                ]
-                            ] [
-                                text "Unit",
-                                select [
-                                    classList [
-                                        ("uk-select", True)
-                                    ]
-                                ] [
-                                    option [] [ text "ml" ],
-                                    option [] [ text "oz" ]
-                                ]
+                                option [] [ text "ml" ],
+                                option [] [ text "oz" ]
                             ]
                         ]
                     ]
@@ -374,80 +381,29 @@ viewCocktailDetailBody = div [
                         ("uk-grid-divider", True),
                         ("uk-child-width-1-2", True)
                     ]
-                ] [
-                    div [
-                        Attr.style "text-align" "center",
-                        classList [
-                            ("uk-flex-center", True),
-                            ("uk-margin-top", True)
-                        ]
-                    ] [
-                        text "Gin"
-                    ],
-                    div [
-                        Attr.style "text-align" "center",
-                        classList [
-                            ("uk-flex-center", True),
-                            ("uk-margin", True)
-                        ]
-                    ] [
-                        text "50ml"
-                    ],
-                    div [
-                        Attr.style "text-align" "center",
-                        classList [
-                            ("uk-flex-center", True),
-                            ("uk-margin", True)
-                        ]
-                    ] [
-                        text "Tonic Water"
-                    ],
-                    div [
-                        Attr.style "text-align" "center",
-                        classList [
-                            ("uk-flex-center", True),
-                            ("uk-margin", True)
-                        ]
-                    ] [
-                        text "50ml"
-                    ],
-                    div [
-                        Attr.style "text-align" "center",
-                        classList [
-                            ("uk-flex-center", True),
-                            ("uk-margin", True)
-                        ]
-                    ] [
-                        text "Ice cube"
-                    ],
-                    div [
-                        Attr.style "text-align" "center",
-                        classList [
-                            ("uk-flex-center", True),
-                            ("uk-margin", True)
-                        ]
-                    ] [
-                        text "6 pieces"
-                    ],
-                    div [
-                        Attr.style "text-align" "center",
-                        classList [
-                            ("uk-flex-center", True),
-                            ("uk-margin", True)
-                        ]
-                    ] [
-                        text "Apple slice"
-                    ],
-                    div [
-                        Attr.style "text-align" "center",
-                        classList [
-                            ("uk-flex-center", True),
-                            ("uk-margin", True)
-                        ]
-                    ] [
-                        text "2 pieces"
-                    ]
                 ]
+                ((List.foldr (++) [] (List.map (\i -> viewCocktailDetailBodyIngredient i "ml") cocktail.ingredients)) ++
+                (List.foldr (++) [] (List.map (\a -> viewCocktailDetailBodyAccessory a) cocktail.accessories)) ++
+                [
+                    div [
+                            Attr.style "text-align" "center",
+                            classList [
+                                ("uk-flex-center", True),
+                                ("uk-margin-top", True)
+                            ]
+                        ] [
+                            text "Ice cubes"
+                        ],
+                        div [
+                            Attr.style "text-align" "center",
+                            classList [
+                                ("uk-flex-center", True),
+                                ("uk-margin", True)
+                            ]
+                        ] [
+                            text (String.fromInt cocktail.ice_cubes)
+                ]])
+
             ]
         ],
         div [
@@ -471,7 +427,7 @@ viewCocktailDetail = div [ ] [
             viewCocktailDetailHeader
         ] [ ("uk-container", True), ("uk-box-shadow-xlarge", True) ],
         viewCard [
-            viewCocktailDetailBody
+            viewCocktailDetailBody defaultCocktail
         ] [ ("uk-container", True), ("uk-margin", True), ("uk-box-shadow-medium", True) ]
     ]
 
@@ -499,6 +455,26 @@ viewContent contentItems =  div [
         ]
     ] contentItems
 
+view404 : Html msg
+view404 = div [
+        classList [
+            ("elm", True)
+        ]
+    ]
+    [
+        viewHeader [
+        viewHeaderItem [ viewHeaderLogo "/images/logo.svg" ] "/",
+        viewHeaderItem [ text "Drinks" ] "/drinks",
+        viewHeaderItem [ text "Ingredients" ] "/ingredients",
+        viewHeaderItem [ text "Accessories" ] "/accessories",
+        viewHeaderItem [ text "Glasses" ] "/glasses"
+    ],
+        viewContent [ span [] [text "404 - Not found" ] ],
+        -- viewContent (List.repeat 20 viewCocktailCard)
+        -- viewContent (List.repeat 10 (viewIngredientCategory defaultIngredientCategory))
+        viewFooter
+    ]
+
 view : Model -> Browser.Document Msg
 view model =
     case model.route of
@@ -513,14 +489,14 @@ view model =
                     ]
                     [
                         viewHeader [
-                            viewHeaderItem [ viewHeaderLogo "images/logo.svg" ] "/",
+                            viewHeaderItem [ viewHeaderLogo "/images/logo.svg" ] "/",
                             viewHeaderItem [ text "Drinks" ] "/drinks",
                             viewHeaderItem [ text "Ingredients" ] "/ingredients",
                             viewHeaderItem [ text "Accessories" ] "/accessories",
                             viewHeaderItem [ text "Glasses" ] "/glasses"
                         ],
                         -- viewContent [ viewCocktailDetail ],
-                        viewContent (List.repeat 20 viewCocktailCard),
+                        viewContent (List.repeat 20 (viewCocktailCard defaultCocktail)),
                         -- viewContent (List.repeat 10 (viewIngredientCategory defaultIngredientCategory)),
                         viewFooter
                     ]]
@@ -536,8 +512,8 @@ view model =
                     ]
                     [
                         viewHeader [
-                            viewHeaderItem [ viewHeaderLogo "images/logo.svg" ] "/",
-                            viewHeaderItem [ text "Drinks" ] "/drinks",
+                            viewHeaderItem [ viewHeaderLogo "/images/logo.svg" ] "/",
+                            viewHeaderItem [ text "Drinks" ] "/",
                             viewHeaderItem [ text "Ingredients" ] "/ingredients",
                             viewHeaderItem [ text "Accessories" ] "/accessories",
                             viewHeaderItem [ text "Glasses" ] "/glasses"
@@ -555,23 +531,5 @@ view model =
         Error code ->
             {
                 title = "Not found",
-                body = [
-                    div [
-                        classList [
-                            ("elm", True)
-                        ]
-                    ]
-                    [
-                        viewHeader [
-                            viewHeaderItem [ viewHeaderLogo "images/logo.svg" ] "/",
-                            viewHeaderItem [ text "Drinks" ] "/drinks",
-                            viewHeaderItem [ text "Ingredients" ] "/ingredients",
-                            viewHeaderItem [ text "Accessories" ] "/accessories",
-                            viewHeaderItem [ text "Glasses" ] "/glasses"
-                        ],
-                        viewContent [ span [] [text "404 - Not found" ] ],
-                        -- viewContent (List.repeat 20 viewCocktailCard)
-                        -- viewContent (List.repeat 10 (viewIngredientCategory defaultIngredientCategory))
-                        viewFooter
-                    ]]
+                body = [ view404 ]
             }
