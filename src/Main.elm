@@ -464,7 +464,7 @@ view404 = div [
     [
         viewHeader [
         viewHeaderItem [ viewHeaderLogo "/images/logo.svg" ] "/",
-        viewHeaderItem [ text "Drinks" ] "/drinks",
+        viewHeaderItem [ text "Drinks" ] "/",
         viewHeaderItem [ text "Ingredients" ] "/ingredients",
         viewHeaderItem [ text "Accessories" ] "/accessories",
         viewHeaderItem [ text "Glasses" ] "/glasses"
@@ -490,7 +490,7 @@ view model =
                     [
                         viewHeader [
                             viewHeaderItem [ viewHeaderLogo "/images/logo.svg" ] "/",
-                            viewHeaderItem [ text "Drinks" ] "/drinks",
+                            viewHeaderItem [ text "Drinks" ] "/",
                             viewHeaderItem [ text "Ingredients" ] "/ingredients",
                             viewHeaderItem [ text "Accessories" ] "/accessories",
                             viewHeaderItem [ text "Glasses" ] "/glasses"
