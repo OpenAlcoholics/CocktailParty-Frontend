@@ -14,24 +14,6 @@ jobs:
             - .
 
 
-  deploy:
-    docker:
-    - image: circleci/python:3.7
-    # Update server image
-    steps:
-    - attach_workspace:
-        at: static
-    - run:
-        name: LS
-        command: ls -R
-    - run:
-        name: Install aws cli
-        command: sudo pip install awscli
-    - run:
-        name: Deploy to S3
-        command: aws s3 sync static s3://opencocktail --delete
-
-
   markdown_lint:
     docker:
     - image: 06kellyjac/markdownlint-cli:0.13.0-alpine
@@ -50,6 +32,3 @@ workflows:
             only:
             - develop
             - master
-    - deploy:
-        requires:
-        - build
