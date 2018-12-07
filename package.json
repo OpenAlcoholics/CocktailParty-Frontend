@@ -4,10 +4,10 @@
   "description": "",
   "main": "src/main.js",
   "dependencies": {
-    "elm": "^0.19.0-bugfix2",
-    "elm-serve": "^0.3.1"
+    "elm": "^0.19.0-bugfix2"
   },
   "devDependencies": {
+    "elm-serve": "^0.3.1"
   },
   "scripts": {
     "build": "elm make ./src/Main.elm --output static/app.js",
