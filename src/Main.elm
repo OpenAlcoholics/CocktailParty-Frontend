@@ -199,7 +199,7 @@ defaultIngredientCategory = {
         id = 1,
         name = "Ingredient category",
         description = "An ingredient category",
-        image_link = "https://images.unsplash.com/photo-1500087350143-69a9e170092a?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=abd759f4c7886ad4132e3e9ddd1ed375&auto=format&fit=crop&w=1950&q=80",
+        image_link = "/images/category.png",
         is_alcoholic = True
     }
 
@@ -418,8 +418,14 @@ viewCocktailDetailBody cocktail = div [
                     ("uk-margin-top", True)
                 ]
             ] [
-                text "Classic and easy, the gin and tonic is light and refreshing. It is a simple mixed drink—requiring just the two ingredients—and is perfect for happy hour, dinner, or anytime you simply want an invigorating beverage."
+                text ("Put " + cocktail.ice_cubes + "into the glass. Pour " + (String.join ", " (List.map (\n -> n.name) cocktail.ingredients)) + " over the ice cubes." + "Garnish with " + (String.join ", " (List.map (\n -> n.name) cocktail.ingredients)))
             ]
+        ],
+        div [
+            classList [
+            ]
+        ] [
+            text "Test"
         ]
     ]
 
