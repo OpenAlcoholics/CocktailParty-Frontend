@@ -426,12 +426,23 @@ viewCocktailDetailBody cocktail = div [
                     ("uk-margin-top", True)
                 ]
             ] [
-                text ("Put " + cocktail.ice_cubes + "into the glass. Pour " + (String.join ", " (List.map (\n -> n.name) cocktail.ingredients)) + " over the ice cubes." + "Garnish with " + (String.join ", " (List.map (\n -> n.name) cocktail.ingredients)))
+                text ("Put " ++ (String.fromInt cocktail.ice_cubes) ++ " ice cubes into the glass."),
+                text ("Pour " ++ (String.join ", " (List.map (\n -> n.name) cocktail.ingredients)) ++
+                    " over the ice cubes."),
+                text (" Garnish with " ++ (String.join ", " (List.map (\n -> n.name) cocktail.ingredients)))
             ]
         ],
+        hr [
+            classList [
+                ("uk-width-1-1", True),
+                ("uk-margin", True),
+                ("uk-margin-left", True)
+            ]
+        ] [],
         div [
             Attr.id "description",
             classList [
+                ("uk-width-1-1", True)
             ]
         ] [
             text cocktail.description
