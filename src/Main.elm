@@ -254,6 +254,7 @@ defaultCocktail = {
             { id = 0, name = "Gin", share = 60 },
             { id = 1, name = "Tonic Water", share = 40 }
         ],
+        description = "Classic and easy, the gin and tonic is light and refreshing. It is a simple mixed drink—requiring just the two ingredients—and is perfect for happy hour, dinner, or anytime you simply want an invigorating beverage.",
         accessories = [
             { name = "Apple slice", id = 0, amount = 2 }
         ],
@@ -269,7 +270,7 @@ viewCocktailCard cocktail = div [ ] [
         ] []
     ]
 
-viewCocktailDetailHeader = div [
+viewCocktailDetailHeader cocktail = div [
         classList [
             ("uk-card-media-left", True)
         ]
@@ -279,9 +280,16 @@ viewCocktailDetailHeader = div [
             classList [
             ]
         ] [
-            a [ Attr.href (pathFor (CocktailDetail 0)), classList [ ("uk-heading-hero", True), ("uk-link-heading", True), ("uk-link-reset", True) ] ] [ text "Gin & Tonic" ],
+            a [ Attr.href (pathFor (CocktailDetail 0)), classList [ ("uk-heading-hero", True), ("uk-link-heading", True), ("uk-link-reset", True) ] ] [ text cocktail.name ],
             hr [ Attr.style "width" "100%" ] [],
-            dd [ classList [ ("", True) ] ] [ text "Classic and easy, the gin and tonic is light and refreshing. It is a simple mixed drink—requiring just the two ingredients—and is perfect for happy hour, dinner, or anytime you simply want an invigorating beverage." ],
+            dd [ classList [ ("", True) ] ] [
+                a [
+                    Attr.href "#description",
+                    Attr.style "color" "#666"
+                ] [
+                    text ((String.dropRight ((String.length cocktail.description) - 50) cocktail.description) ++ "...")
+                ]
+            ],
             hr [] [],
             viewTagList (List.repeat 5 defaultTag)
         ]
@@ -422,17 +430,18 @@ viewCocktailDetailBody cocktail = div [
             ]
         ],
         div [
+            Attr.id "description",
             classList [
             ]
         ] [
-            text "Test"
+            text cocktail.description
         ]
     ]
 
 viewCocktailDetail : Html msg
 viewCocktailDetail = div [ ] [
         viewCard [
-            viewCocktailDetailHeader
+            viewCocktailDetailHeader defaultCocktail
         ] [ ("uk-container", True), ("uk-box-shadow-xlarge", True) ],
         viewCard [
             viewCocktailDetailBody defaultCocktail
