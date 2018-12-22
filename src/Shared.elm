@@ -48,6 +48,7 @@ type alias IngredientCategory = {
 type alias Cocktail = {
         id: Int,
         name: String,
+        description: String,
         ingredients: List Ingredient,
         accessories: List Accessory,
         ice_cubes: Int
