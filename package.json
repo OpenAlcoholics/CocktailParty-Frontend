@@ -13,7 +13,8 @@
   },
   "scripts": {
     "build": "elm make ./src/Main.elm --output static/main.js",
-    "serve": "./node_modules/.bin/elm-serve -d static"
+    "serve": "./node_modules/.bin/elm-serve -d static",
+    "less": "./node_modules/.bin/lessc static/css/main.less static/css/main.css"
   },
   "repository": {
     "type": "git",
