@@ -5,7 +5,8 @@
   "main": "src/main.js",
   "dependencies": {
     "elm": "^0.19.0-bugfix2",
-    "elm-serve": "^0.3.1"
+    "elm-serve": "^0.3.1",
+    "less": "^3.9.0"
   },
   "devDependencies": {
     "uglify-js": "^3.4.9"
