@@ -109,15 +109,15 @@ viewHeaderLogo link = img [
         ]
     ] []
 
-viewIcon : String -> Html msg
-viewIcon name = span [
+viewIcon : String -> (List (Html.Attribute msg)) -> Html msg
+viewIcon name attrs = span ([
         Attr.style "color" "#000",
         Attr.style "padding" "3px",
         Attr.attribute "uk-icon" ("icon: " ++ name),
         classList [
             ("uk-icon", True)
         ]
-    ] []
+    ]  ++ attrs) []
 
 type alias Image = {
         src: String,
@@ -142,7 +142,7 @@ viewImage image extra_classes = img [
 viewTag : Tag -> Html msg
 viewTag tag = span [ class "uk-label uk-border-pill", Attr.style "background" "#CCC", Attr.style "margin-right" "5px" ] [
     a [ Attr.href (pathFor (TagDetail tag.id)), Attr.style "color" "#666", class "uk-link-muted" ] [ text (tag.text) ],
-    a [ Attr.href (pathFor (TagDetail tag.id)) ] [ viewIcon "trash" ]
+    a [ Attr.href (pathFor (TagDetail tag.id)) ] [ viewIcon "trash" [] ]
     ]
 
 viewTagList : List Tag -> Html msg
@@ -158,11 +158,43 @@ viewCocktailCardHeader : Html msg -> String -> String -> Html msg
 viewCocktailCardHeader iconItem headerText link = div [
         classList [
             ("uk-card-header", True),
-            ("uk-padding-small", True)
+            ("uk-padding-small", True),
+            ("uk-media-left", True),
+            ("uk-child-width-1-2", True),
+            ("uk-grid", True)
         ]
     ] [
         a [ Attr.href (pathFor (CocktailDetail 0)) ] [ iconItem ],
-        (viewCardTitle headerText link)
+        div [
+            Attr.style "margin-left" "-80px",
+            Attr.style "margin-top" "10px"
+        ] [
+            (viewCardTitle headerText link),
+            viewRating defaultCocktail
+        ]
+    ]
+
+viewRating : Cocktail -> Html msg
+viewRating cocktail = div [
+        classList [
+            ("star-ratings-css", True)
+        ]
+    ] [
+        div [
+            classList [
+                ("star-ratings-css-bottom", True)
+            ]
+        ] (List.repeat 5
+                (span [] [ text "★" ])
+            ),
+        div [
+            classList [
+                ("star-ratings-css-top", True)
+            ],
+            Attr.style "width" ((String.fromInt (truncate (cocktail.rating * 20))) ++ "%")
+        ] (List.repeat 5
+                (span [] [ text "★" ])
+            )
     ]
 
 viewCardTitle : String -> String -> Html msg
@@ -172,7 +204,7 @@ viewCardTitle titleText link = span [
             ("uk-link", True),
             ("uk-card-title", True)
         ]
-    ] [ a [ Attr.href link, class "uk-link uk-link-muted uk-margin-left" ] [ text titleText ] ]
+    ] [ a [ Attr.href link, class "uk-link uk-link-muted"] [ text titleText ] ]
 
 viewCardBody : String -> Html msg
 viewCardBody bodyText = div [
@@ -255,19 +287,26 @@ defaultCocktail = {
             { id = 1, name = "Tonic Water", share = 40 }
         ],
         description = "Classic and easy, the gin and tonic is light and refreshing. It is a simple mixed drink—requiring just the two ingredients—and is perfect for happy hour, dinner, or anytime you simply want an invigorating beverage.",
+        image_link = "/images/gandt.png",
         accessories = [
             { name = "Apple slice", id = 0, amount = 2 }
         ],
-        ice_cubes = 6
+        ice_cubes = 6,
+        rating = 3.8
     }
 
 viewCocktailCard : Cocktail -> Html Msg
-viewCocktailCard cocktail = div [ ] [
+viewCocktailCard cocktail = div [
+        classList [
+            ("uk-media-left", True)
+        ]
+    ] [
         viewCard [
-            (viewCocktailCardHeader (viewImage { src = "/images/gandt.png", height = 50, width = 50 } [ ("uk-border-circle", True) ]) cocktail.name (pathFor (CocktailDetail cocktail.id))),
+            (viewCocktailCardHeader (viewImage { src = cocktail.image_link, height = 80, width = 80} [ ("uk-border-circle", True), ("uk-media-left", True) ]) cocktail.name (pathFor (CocktailDetail cocktail.id))),
             (viewIngredientList cocktail.ingredients),
             (viewCardFooter (List.repeat 5 defaultTag))
-        ] []
+        ] [
+        ]
     ]
 
 viewCocktailDetailHeader cocktail = div [
@@ -467,7 +506,7 @@ viewFooter = div [
             ("uk-flex-center", True)
         ]
     ] [
-        a [ Attr.href "https://github.com/OpenAlcoholics/CocktailParty-Frontend" ] [ viewIcon "github-alt" ]
+        a [ Attr.href "https://github.com/OpenAlcoholics/CocktailParty-Frontend" ] [ viewIcon "github-alt" [] ]
     ]
 
 viewContent : List (Html Msg) -> Html Msg
