@@ -51,7 +51,9 @@ type alias Cocktail = {
         description: String,
         ingredients: List Ingredient,
         accessories: List Accessory,
-        ice_cubes: Int
+        ice_cubes: Int,
+        image_link: String,
+        rating: Float
     }
 
 type alias Model = {
